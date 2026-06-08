@@ -40,62 +40,40 @@ export class TaskService {
   }
 
   getTasks(): Observable<Task[]> {
-    return this.http.get<Task[]>(this.api).pipe(
-      tap(tasks => this.saveLocalTasks(tasks)),
-      catchError(() => of(this.getLocalTasks()))
-    );
+    return of(this.getLocalTasks());
   }
 
   getTask(id: string): Observable<Task> {
-    return this.http.get<Task>(`${this.api}/${id}`).pipe(
-      catchError(() => {
-        const local = this.getLocalTasks().find(t => t.id === id);
-        return local ? of(local) : throwError(() => new Error('Tarea no encontrada'));
-      })
-    );
+    const local = this.getLocalTasks().find(t => t.id === id);
+    return local ? of(local) : throwError(() => new Error('Tarea no encontrada'));
   }
 
   createTask(task: Omit<Task, 'id'>): Observable<Task> {
-    return this.http.post<Task>(this.api, task).pipe(
-      tap(() => this.getTasks().subscribe()),
-      catchError(() => {
-        const local = this.getLocalTasks();
-        const newTask: Task = {
-          ...task,
-          id: Date.now().toString()
-        };
-        local.push(newTask);
-        this.saveLocalTasks(local);
-        return of(newTask);
-      })
-    );
+    const local = this.getLocalTasks();
+    const newTask: Task = {
+      ...task,
+      id: Date.now().toString()
+    };
+    local.push(newTask);
+    this.saveLocalTasks(local);
+    return of(newTask);
   }
 
   updateTask(id: string, task: Task): Observable<Task> {
-    return this.http.put<Task>(`${this.api}/${id}`, task).pipe(
-      tap(() => this.getTasks().subscribe()),
-      catchError(() => {
-        const local = this.getLocalTasks();
-        const index = local.findIndex(t => t.id === id);
-        if (index > -1) {
-          local[index] = { ...local[index], ...task, id };
-          this.saveLocalTasks(local);
-          return of(local[index]);
-        }
-        return throwError(() => new Error('Tarea no encontrada'));
-      })
-    );
+    const local = this.getLocalTasks();
+    const index = local.findIndex(t => t.id === id);
+    if (index > -1) {
+      local[index] = { ...local[index], ...task, id };
+      this.saveLocalTasks(local);
+      return of(local[index]);
+    }
+    return throwError(() => new Error('Tarea no encontrada'));
   }
 
   deleteTask(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.api}/${id}`).pipe(
-      tap(() => this.getTasks().subscribe()),
-      catchError(() => {
-        const local = this.getLocalTasks();
-        const updated = local.filter(t => t.id !== id);
-        this.saveLocalTasks(updated);
-        return of(undefined);
-      })
-    );
+    const local = this.getLocalTasks();
+    const updated = local.filter(t => t.id !== id);
+    this.saveLocalTasks(updated);
+    return of(undefined);
   }
 }

@@ -38,7 +38,8 @@ export class Register {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.authService.register(this.userData).subscribe({
+    this.router.navigate(['/tasks']);
+    /*this.authService.register(this.userData).subscribe({
       next: () => {
         this.router.navigate(['/tasks']);
       },
@@ -50,6 +51,6 @@ export class Register {
           this.errorMessage = 'Error al conectar con el servidor.';
         }
       }
-    });
+    });*/
   }
 }

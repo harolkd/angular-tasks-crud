@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../auth/services/auth';
 import { TaskService, Task } from '../services/task';
+import { App } from '../../app'
 
 @Component({
   selector: 'app-task-list',
@@ -12,7 +13,8 @@ import { TaskService, Task } from '../services/task';
   styleUrl: './task-list.css',
 })
 export class TaskList implements OnInit {
-  tasks: Task[] = [];
+  appService = inject(App);
+  tasks = this.appService.tasks;
   filteredTasks: Task[] = [];
   searchQuery: string = '';
   filterStatus: 'all' | 'active' | 'completed' = 'all';
