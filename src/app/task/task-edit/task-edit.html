@@ -1,0 +1,49 @@
+<div class="form-layout">
+  <div class="form-card">
+    <div class="form-header">
+      <div class="back-link" (click)="cancel()">← Volver a la lista</div>
+      <h2>Editar Tarea</h2>
+      <p>Modifica los detalles de tu actividad.</p>
+    </div>
+
+    <div *ngIf="!isFetching">
+      <div *ngIf="errorMessage" class="error-banner">
+        <span>⚠️ {{ errorMessage }}</span>
+      </div>
+
+      <form (ngSubmit)="onSubmit()" #editForm="ngForm" novalidate>
+        <div class="form-group">
+          <label for="title">Título de la tarea <span class="required">*</span></label>
+          <input type="text" id="title" name="title" placeholder="Escribe el título..." [(ngModel)]="task.title"
+            required #titleInput="ngModel" [class.has-error]="errorMessage && !task.title" />
+          <span class="help-text" *ngIf="errorMessage && !task.title">El título es requerido para guardar la
+            tarea.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Descripción</label>
+          <textarea id="description" name="description" rows="4" placeholder="Agrega notas adicionales..."
+            [(ngModel)]="task.description"></textarea>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label class="toggle-container">
+            <input type="checkbox" name="completed" [(ngModel)]="task.completed" />
+            <span class="toggle-slider"></span>
+            <span class="toggle-label">Marcar como completada</span>
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="cancel()" [disabled]="isLoading">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+            <span class="btn-spinner" *ngIf="isLoading"></span>
+            {{ isLoading ? 'Guardando...' : 'Guardar Cambios' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

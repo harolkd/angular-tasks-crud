@@ -1,0 +1,98 @@
+<div class="app-layout">
+  <main class="main-content">
+    <div class="action-bar">
+      <div class="welcome-text">
+        <h2>Mis Tareas</h2>
+        <p>Organiza tus actividades diarias de forma sencilla.</p>
+      </div>
+      <button class="create-btn" [routerLink]="['/tasks/create']">
+        <span class="btn-icon">+</span> Nueva Tarea
+      </button>
+    </div>
+
+    <div class="controls-card">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Buscar tareas por título o descripción..." [(ngModel)]="searchQuery"
+          (ngModelChange)="applyFilter()" />
+      </div>
+
+      <div class="filter-tabs">
+        <button [class.active]="filterStatus === 'all'" (click)="setFilter('all')">
+          Todas
+        </button>
+        <button [class.active]="filterStatus === 'active'" (click)="setFilter('active')">
+          Pendientes
+        </button>
+        <button [class.active]="filterStatus === 'completed'" (click)="setFilter('completed')">
+          Completadas
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-banner">
+      <p>{{ errorMessage }}</p>
+      <button (click)="loadTasks()" class="retry-btn">Reintentar</button>
+    </div>
+
+    <div *ngIf="isLoading" class="loader-container">
+      <p>No hay tareas...</p>
+    </div>
+
+    <div *ngIf="!isLoading && filteredTasks.length === 0" class="empty-state">
+      <div class="empty-illustration">📅</div>
+      <h3>No hay tareas</h3>
+      <p *ngIf="filterStatus === 'all' && !searchQuery">¡Excelente! No tienes tareas pendientes. Crea una nueva tarea
+        para comenzar.</p>
+      <p *ngIf="filterStatus !== 'all' || searchQuery">No se encontraron tareas que coincidan con la búsqueda o filtro
+        aplicado.</p>
+      <button *ngIf="filterStatus === 'all' && !searchQuery" class="create-btn" [routerLink]="['/tasks/create']">
+        Crear mi primera tarea
+      </button>
+    </div>
+
+    <div *ngIf="!isLoading && filteredTasks.length > 0" class="tasks-grid">
+      <div *ngFor="let task of filteredTasks" class="task-card" [class.completed]="task.completed">
+        <div class="task-card-content">
+          <button class="checkbox-wrapper" (click)="toggleTaskStatus(task)"
+            [attr.aria-label]="task.completed ? 'Marcar como pendiente' : 'Marcar como completada'">
+            <div class="custom-checkbox" [class.checked]="task.completed">
+              <span class="checkmark" *ngIf="task.completed">✓</span>
+            </div>
+          </button>
+
+          <div class="task-details">
+            <h3 class="task-title" [class.line-through]="task.completed">
+              {{ task.title }}
+            </h3>
+            <p class="task-desc">{{ task.description }}</p>
+
+            <div class="task-meta">
+              <span class="status-badge" [class.badge-completed]="task.completed"
+                [class.badge-pending]="!task.completed">
+                {{ task.completed ? 'Completada' : 'Pendiente' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="task-card-actions" *ngIf="showDeleteConfirmId !== task.id">
+          <button class="action-btn edit" [routerLink]="['/tasks', task.id, 'edit']" title="Editar tarea">
+            ✏️ <span>Editar</span>
+          </button>
+          <button class="action-btn delete" (click)="confirmDelete(task.id!)" title="Eliminar tarea">
+            🗑️ <span>Eliminar</span>
+          </button>
+        </div>
+
+        <div class="delete-confirmation" *ngIf="showDeleteConfirmId === task.id">
+          <p>¿Confirmas la eliminación?</p>
+          <div class="confirm-buttons">
+            <button class="confirm-btn yes" (click)="deleteTask(task.id!)">Sí, eliminar</button>
+            <button class="confirm-btn no" (click)="cancelDelete()">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
